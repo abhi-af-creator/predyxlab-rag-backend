@@ -8,3 +8,5 @@ build
 frontend/
 frontend_old/
 node_modules/
+data/
+data/uploads/
