@@ -6,4 +6,7 @@ sentence-transformers
 numpy
 faiss-cpu
 requests
+fastapi
+gunicorn
+uvicorn
 
