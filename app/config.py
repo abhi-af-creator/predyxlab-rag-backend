@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+
 
 BASE_DIR = Path(os.getenv("HOME", "/home")) #Path(__file__).resolve().parent.parent
 
