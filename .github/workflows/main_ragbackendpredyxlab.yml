@@ -1,14 +1,13 @@
-name: Deploy FastAPI to Azure App Service
+name: Deploy RAG Backend to Azure
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     permissions:
       id-token: write
       contents: read
@@ -28,3 +27,6 @@ jobs:
         with:
           app-name: RAGbackendpredyxlab
           package: .
+
+
+

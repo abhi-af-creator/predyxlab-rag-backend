@@ -19,7 +19,7 @@ def chat(request: ChatRequest):
     # Embed query (FIXED)
     query_embedding = EmbeddingModel.embed_texts(
         [request.question]
-    )[0]
+    )
 
     # Retrieve
     raw_results = state.VECTOR_STORE.search(
