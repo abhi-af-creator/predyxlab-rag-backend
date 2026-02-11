@@ -1,29 +1,15 @@
-from typing import List
-import numpy as np
-from sentence_transformers import SentenceTransformer
-from app.config import EMBEDDING_MODEL_NAME
+import requests
 
+ML_SERVICE_URL = "http://20.168.119.134:8001/embed"
 
 class EmbeddingModel:
-    """
-    Singleton-style embedding loader.
-    Model loads once per process.
-    """
 
-    _model = None
-
-    @classmethod
-    def get_model(cls) -> SentenceTransformer:
-        if cls._model is None:
-            cls._model = SentenceTransformer(EMBEDDING_MODEL_NAME)
-        return cls._model
-
-    @classmethod
-    def embed_texts(cls, texts: List[str]) -> np.ndarray:
-        model = cls.get_model()
-        embeddings = model.encode(
-            texts,
-            show_progress_bar=False,
-            normalize_embeddings=True
+    @staticmethod
+    def embed_texts(texts):
+        response = requests.post(
+            ML_SERVICE_URL,
+            json={"texts": texts},
+            timeout=120
         )
-        return embeddings
+        response.raise_for_status()
+        return response.json()["embeddings"]

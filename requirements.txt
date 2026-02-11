@@ -3,7 +3,6 @@ gunicorn
 uvicorn
 pypdf
 python-multipart
-sentence-transformers
-numpy
+numpy<2
 faiss-cpu
 requests
