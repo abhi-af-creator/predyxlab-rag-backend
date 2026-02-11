@@ -9,19 +9,25 @@ router = APIRouter(prefix="/rag", tags=["rag"])
 
 @router.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    if state.VECTOR_STORE is None or state.ACTIVE_DOC_ID is None:
+
+    if state.VECTOR_STORE is None:
+        raise HTTPException(status_code=400, detail="Vector store not initialized")
+
+    if state.ACTIVE_DOC_ID is None:
         raise HTTPException(status_code=400, detail="No document indexed yet")
 
-    # Embed query
-    query_embedding = EmbeddingModel.embed_texts([request.question])
+    # Embed query (FIXED)
+    query_embedding = EmbeddingModel.embed_texts(
+        [request.question]
+    )[0]
 
     # Retrieve
     raw_results = state.VECTOR_STORE.search(
         query_embedding=query_embedding,
-        top_k=request.top_k * 3  # overfetch
+        top_k=request.top_k * 3
     )
 
-    # 🔥 FILTER BY ACTIVE DOCUMENT
+    # Filter by active document
     results = [
         r for r in raw_results
         if r["doc_id"] == state.ACTIVE_DOC_ID
@@ -29,17 +35,20 @@ def chat(request: ChatRequest):
 
     if not results:
         return {
-            "answer": "No relevant information found in the current document.",
+            "answer": "I don't know based on the document.",
             "sources": []
         }
 
-    # Build context
     context = "\n\n".join(r["text"] for r in results)
 
     prompt = f"""
-You are a research assistant.
-Answer ONLY using the context below.
-If the answer is not in the context, say "I don't know".
+You are a precise research assistant.
+
+Rules:
+- Use ONLY the information provided in the context.
+- Do NOT use prior knowledge.
+- Do NOT guess.
+- If the answer is not explicitly stated, reply: "I don't know based on the document."
 
 Context:
 {context}
@@ -47,7 +56,7 @@ Context:
 Question:
 {request.question}
 
-Answer:
+Answer (concise, factual):
 """.strip()
 
     answer = OllamaClient.generate(prompt)
