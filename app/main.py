@@ -7,16 +7,26 @@ from app.api.search import router as search_router
 from app.api.chat import router as chat_router
 from app.api import search
 
+from app.core.embeddings import EmbeddingModel
+
+
+
+
 app = FastAPI(
     title="PredyxLab Research Assistant API",
     version="0.1.0"
 )
 
+@app.on_event("startup")
+def load_models():
+    EmbeddingModel.get_model()
+
 # -------------------- CORS --------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://orange-moss-08315ef00.2.azurestaticapps.net",
-                   "https://calm-meadow-06bb15200.2.azurestaticapps.net"],   # tighten later
+                  "https://black-grass-09ef5ab00.2.azurestaticapps.net",
+                  "https://calm-meadow-06bb15200.2.azurestaticapps.net"],   # tighten later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

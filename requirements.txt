@@ -6,3 +6,7 @@ python-multipart
 numpy<2
 faiss-cpu
 requests
+
+torch==2.2.2
+sentence-transformers==2.6.1
+transformers==4.38.2

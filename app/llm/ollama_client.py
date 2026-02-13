@@ -1,8 +1,9 @@
 import requests
+import os
 
 
 class OllamaClient:
-    BASE_URL = "http://20.168.119.134:11434"
+    BASE_URL = os.getenv("OLLAMA_BASE_URL","http://localhost:11434")
     MODEL = "llama3"
 
     @classmethod

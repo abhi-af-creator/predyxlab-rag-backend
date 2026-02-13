@@ -4,7 +4,7 @@ from typing import List
 
 class ChatRequest(BaseModel):
     question: str
-    top_k: int = 5
+    top_k: int = 2
 
 
 class ChatResponse(BaseModel):
