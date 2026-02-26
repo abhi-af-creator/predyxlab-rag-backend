@@ -55,5 +55,8 @@ def health():
 
 @app.get("/test-ollama")
 def test_ollama():
-    from app.llm.ollama_client import OllamaClient
-    return{"response": OllamaClient.generate("How are you?")}
+    #from app.llm.ollama_client import OllamaClient
+    #return{"response": OllamaClient.generate("How are you?")}
+    return {
+        "response": "LLM backend temporarily disabled for demo deployment."
+    }

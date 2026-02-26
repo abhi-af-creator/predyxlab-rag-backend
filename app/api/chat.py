@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.core.embeddings import EmbeddingModel
@@ -16,12 +17,12 @@ def chat(request: ChatRequest):
     if state.ACTIVE_DOC_ID is None:
         raise HTTPException(status_code=400, detail="No document indexed yet")
 
-    # Embed query (FIXED)
+    # Embed query
     query_embedding = EmbeddingModel.embed_texts(
         [request.question]
     )
 
-    # Retrieve
+    # Retrieve relevant chunks
     raw_results = state.VECTOR_STORE.search(
         query_embedding=query_embedding,
         top_k=request.top_k * 3
@@ -59,10 +60,23 @@ Question:
 Answer (concise, factual):
 """.strip()
 
-    answer = OllamaClient.generate(prompt)
+    # -------------------- LLM TOGGLE --------------------
+    llm_enabled = os.getenv("LLM_ENABLED", "false").lower() == "true"
+
+    if llm_enabled:
+        try:
+            answer = OllamaClient.generate(prompt)
+            answer = answer.strip()
+        except Exception:
+            answer = "LLM backend temporarily unavailable."
+    else:
+        answer = (
+            "LLM backend disabled in demo deployment. "
+            "RAG architecture is implemented but inference is turned off to optimize cloud cost."
+        )
 
     return {
-        "answer": answer.strip(),
+        "answer": answer,
         "sources": [
             f'{r["doc_id"]}:{r["chunk_id"]}'
             for r in results
